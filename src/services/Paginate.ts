@@ -10,7 +10,7 @@ export interface PaginateOptions {
   ) => Promise<AxiosResponse<NSBaseRestResponse>>;
 }
 
-export default class Paginator<Item, Response> {
+export default class Paginate<Item, Response> {
   private offset = 0;
   private limit: number;
   private done = false;
