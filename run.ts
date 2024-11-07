@@ -1,16 +1,15 @@
 import { AxiosError } from "axios";
 import NSClient from "./src/services/netsuiteClient";
-import Paginator from "./src/services/paginate";
+// import Paginator from "./src/services/paginate";
 
 (async () => {
   // Instantiate the NSClient
   const client = new NSClient();
 
-  // // Define the SuiteQL query
+  // Define the SuiteQL query
   // const suiteQLQuery = `select distinct(superitem)  from ItemPresentationItem WHERE presitemid IS NOT NULL`;
-
   // const first = await client.fetchSuiteQL(suiteQLQuery, 0, 10);
-  // console.log("First page:", first.data);
+  // console.log("First page:", first.data.items);
 
   // const paginator = new Paginator({
   //   apiCall: (offset: number, limit: number) =>
@@ -38,10 +37,7 @@ import Paginator from "./src/services/paginate";
   // }
 
   try {
-    const data = await client.request({
-      path: "*",
-      method: "options",
-    });
+    const data = await client.testConnection();
     console.log("OPTIONS Response:", data);
   } catch (error) {
     const err = error as AxiosError;

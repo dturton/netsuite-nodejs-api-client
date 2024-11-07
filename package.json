@@ -1,6 +1,6 @@
 {
   "name": "netsuite-nodejs-api-client",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A TypeScript Node.js module to connect to the NetSuite API",
   "main": "dist/index.js",
   "scripts": {
@@ -13,7 +13,8 @@
   "dependencies": {
     "axios": "^1.7.7",
     "axios-oauth-1.0a": "^0.3.6",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "publish": "^0.6.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

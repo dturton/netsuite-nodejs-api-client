@@ -95,4 +95,17 @@ export default class NSClient {
       throw new NetsuiteError(err);
     }
   }
+
+  async testConnection(): Promise<boolean> {
+    try {
+      const data = await this.client.request({
+        url: "*",
+        method: "options",
+      });
+      console.log("OPTIONS Response:", data);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 }
