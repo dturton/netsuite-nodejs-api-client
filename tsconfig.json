@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2020", // Target modern JavaScript (ES2020)
-    "module": "commonjs", // Use commonjs modules for Node.js
+    "module": "esnext", // Use commonjs modules for Node.js
     "moduleResolution": "node", // Resolve modules like Node.js does
     "strict": true, // Enable strict type checking
     "esModuleInterop": true, // Enable interop between CommonJS and ES modules
@@ -11,7 +11,8 @@
     "rootDir": "./src", // Root directory of source files
     "resolveJsonModule": true, // Allow importing JSON files
     "sourceMap": true, // Generate source maps
-    "types": ["jest", "node"] // Include Jest and Node.js types
+    "types": ["jest", "node"], // Include Jest and Node.js types
+    "declaration": true // Generate type definitions
   },
   "include": ["src/**/*.ts"], // Include all TypeScript files in the `src` directory
   "exclude": ["node_modules", "dist"] // Exclude `node_modules` and `dist` directories
