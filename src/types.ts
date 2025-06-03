@@ -242,3 +242,9 @@ export type NetsuiteRequestOptions = {
   body?: any;
   params?: any;
 };
+
+export type OpenAPIMetadataOptions = {
+  recordTypes?: string[];
+  saveToFile?: boolean;
+  fileName?: string;
+};

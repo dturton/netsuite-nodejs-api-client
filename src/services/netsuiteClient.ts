@@ -7,8 +7,10 @@ import {
   TOKEN_ID,
   TOKEN_SECRET,
 } from "../config/environment";
-import { NetsuiteRequestOptions, NSBaseRestResponse } from "../types";
+import { NetsuiteRequestOptions, NSBaseRestResponse, OpenAPIMetadataOptions } from "../types";
 import { NetsuiteError } from "../utils/errorHandler";
+import * as fs from "fs";
+import * as path from "path";
 
 export default class NSClient {
   client: AxiosInstance;
@@ -106,6 +108,46 @@ export default class NSClient {
       return true;
     } catch (error) {
       return false;
+    }
+  }
+
+  async getOpenAPIMetadata(options: OpenAPIMetadataOptions = {}): Promise<any> {
+    const { 
+      recordTypes = [], 
+      saveToFile = false, 
+      fileName = 'netsuite-openapi-metadata.json' 
+    } = options;
+
+    try {
+      // Build the URL with optional record type selection
+      let url = 'record/v1/metadata-catalog';
+      const params: any = {};
+      
+      if (recordTypes.length > 0) {
+        params.select = recordTypes.join(',');
+      }
+
+      // Make the request with proper OpenAPI 3.0 header
+      const response = await this.client.get(url, {
+        headers: {
+          'Accept': 'application/swagger+json'
+        },
+        params
+      });
+
+      const metadata = response.data;
+
+      // Save to file if requested
+      if (saveToFile) {
+        const filePath = path.resolve(process.cwd(), fileName);
+        fs.writeFileSync(filePath, JSON.stringify(metadata, null, 2), 'utf-8');
+        console.log(`OpenAPI metadata saved to: ${filePath}`);
+      }
+
+      return metadata;
+    } catch (error) {
+      const err = error as AxiosError;
+      throw new NetsuiteError(err);
     }
   }
 }

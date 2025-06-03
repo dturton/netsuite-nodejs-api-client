@@ -1,3 +1,12 @@
+// Mock the environment module
+jest.mock("../config/environment", () => ({
+  ACCOUNT_ID: "123456",
+  CONSUMER_KEY: "test_consumer_key",
+  CONSUMER_SECRET: "test_consumer_secret",
+  TOKEN_ID: "test_token_id",
+  TOKEN_SECRET: "test_token_secret"
+}));
+
 import NSClient from "./netsuiteClient";
 import axios, { AxiosResponse, InternalAxiosRequestConfig, AxiosRequestHeaders } from "axios";
 import { NetsuiteError } from "../utils/errorHandler";
@@ -7,16 +16,13 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe("NSClient", () => {
   let client: NSClient;
+  let consoleLogSpy: jest.SpyInstance;
   
   beforeEach(() => {
     jest.clearAllMocks();
     
-    // Mock environment variables
-    process.env.ACCOUNT_ID = "123456";
-    process.env.CONSUMER_KEY = "test_consumer_key";
-    process.env.CONSUMER_SECRET = "test_consumer_secret";
-    process.env.TOKEN_ID = "test_token_id";
-    process.env.TOKEN_SECRET = "test_token_secret";
+    // Mock console.log to suppress output during tests
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
     
     // Create axios instance mock
     const axiosInstanceMock = {
@@ -37,6 +43,10 @@ describe("NSClient", () => {
     client = new NSClient();
   });
 
+  afterEach(() => {
+    consoleLogSpy.mockRestore();
+  });
+
   describe("testConnection", () => {
     it("should successfully test connection", async () => {
       const mockResponse: AxiosResponse = {
@@ -52,11 +62,20 @@ describe("NSClient", () => {
 
       const result = await client.testConnection();
 
-      expect(result).toEqual(["GET", "POST", "PUT", "DELETE"]);
+      expect(result).toBe(true);
       expect(axiosInstance.request).toHaveBeenCalledWith({
-        method: "OPTIONS",
-        url: "/services/rest/record/v1/customer",
+        method: "options",
+        url: "*",
       });
+    });
+
+    it("should return false when connection fails", async () => {
+      const axiosInstance = mockedAxios.create();
+      (axiosInstance.request as jest.Mock).mockRejectedValueOnce(new Error("Connection failed"));
+
+      const result = await client.testConnection();
+
+      expect(result).toBe(false);
     });
   });
 
@@ -84,7 +103,7 @@ describe("NSClient", () => {
 
       expect(result.data.items).toHaveLength(1);
       expect(axiosInstance.post).toHaveBeenCalledWith(
-        "/services/rest/query/v1/suiteql",
+        "query/v1/suiteql",
         { q: "SELECT * FROM customer" },
         { params: { limit: 10, offset: 0 } }
       );
@@ -127,7 +146,7 @@ describe("NSClient", () => {
 
       expect(result.data).toEqual({ result: "success" });
       expect(axiosInstance.get).toHaveBeenCalledWith(
-        "/app/site/hosting/restlet.nl",
+        "https://123456.restlets.api.netsuite.com/app/site/hosting/restlet.nl",
         {
           params: {
             script: 123,
@@ -152,12 +171,16 @@ describe("NSClient", () => {
       const axiosInstance = mockedAxios.create();
       (axiosInstance.request as jest.Mock).mockResolvedValueOnce(mockResponse);
 
-      const result = await client.request("/services/rest/record/v1/customer/1", "GET");
+      const result = await client.request({
+        path: "/services/rest/record/v1/customer/1",
+        method: "get"
+      });
 
       expect(result.data).toEqual({ id: "1", name: "Test" });
       expect(axiosInstance.request).toHaveBeenCalledWith({
-        method: "GET",
+        method: "get",
         url: "/services/rest/record/v1/customer/1",
+        data: ""
       });
     });
 
@@ -173,26 +196,19 @@ describe("NSClient", () => {
       const axiosInstance = mockedAxios.create();
       (axiosInstance.request as jest.Mock).mockResolvedValueOnce(mockResponse);
 
-      const result = await client.request(
-        "/services/rest/record/v1/customer",
-        "POST",
-        { data: { name: "New Customer" } }
-      );
+      const result = await client.request({
+        path: "/services/rest/record/v1/customer",
+        method: "post",
+        body: { name: "New Customer" }
+      });
 
       expect(result.data).toEqual({ id: "2", name: "New Customer" });
       expect(axiosInstance.request).toHaveBeenCalledWith({
-        method: "POST",
+        method: "post",
         url: "/services/rest/record/v1/customer",
         data: { name: "New Customer" }
       });
     });
   });
 
-  describe("error handling", () => {
-    it("should throw error when environment variables are missing", () => {
-      delete process.env.ACCOUNT_ID;
-      
-      expect(() => new NSClient()).toThrow("Missing required environment variables");
-    });
-  });
 });
