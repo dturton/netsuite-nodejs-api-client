@@ -4,7 +4,7 @@ const config: Config.InitialOptions = {
   preset: "ts-jest",
   testEnvironment: "node",
   verbose: true,
-  automock: true,
+  automock: false,
   testMatch: ["**/*.test.ts"],
 };
 export default config;

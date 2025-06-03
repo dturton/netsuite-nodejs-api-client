@@ -1,4 +1,4 @@
-import Paginate from "./src/services/paginate"; // Adjust based on your directory structure
+import Paginate from "./src/services/Paginate"; // Adjust based on your directory structure
 import {
   AxiosRequestHeaders,
   AxiosResponse,
@@ -13,7 +13,7 @@ describe("Paginate class with real-world data", () => {
   >();
 
   // Mock configuration that conforms to InternalAxiosRequestConfig
-  const mockConfig: Partial<InternalAxiosRequestConfig> = {
+  const mockConfig: InternalAxiosRequestConfig = {
     method: "get",
     url: "",
     baseURL: "",
@@ -36,7 +36,7 @@ describe("Paginate class with real-world data", () => {
       forcedJSONParsing: true,
       clarifyTimeoutError: false,
     },
-
+    headers: {} as AxiosRequestHeaders,
     onUploadProgress: undefined,
     onDownloadProgress: undefined,
     decompress: true,
@@ -52,7 +52,7 @@ describe("Paginate class with real-world data", () => {
       links: [
         {
           rel: "next",
-          href: "https://3609571.suitetalk.api.netsuite.com/services/rest/query/v1/suiteql?limit=1000&offset=1000",
+          href: "https://xxxx.suitetalk.api.netsuite.com/services/rest/query/v1/suiteql?limit=1000&offset=1000",
         },
       ],
       count: 2,

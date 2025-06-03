@@ -37,8 +37,8 @@ export default class NSClient {
   // Fetch a single page of SuiteQL data
   async fetchSuiteQL(
     query: string,
-    offset = 0,
-    limit = 10
+    offset = 10,
+    limit = 100
   ): Promise<AxiosResponse<NSBaseRestResponse>> {
     try {
       const response = await this.client.post(
